@@ -12,14 +12,14 @@
   "minRustgisVersion": "0.3.0",
   "permissions": ["edit"],
   "commands": [
-    { "id": "panel-state", "label": "Refresh", "help": "Read the map's layers again.", "icon": "refresh" },
-    { "id": "show-layer", "label": "Show\nLayer", "help": "Show the chosen layer's features and fields.", "icon": "info" },
+    { "id": "panel-state", "label": "Refresh", "help": "Read the map's layers again.", "icon": "update" },
+    { "id": "show-layer", "label": "Show\nLayer", "help": "Show the chosen layer's features and fields.", "icon": "identify" },
     { "id": "zoom-to", "label": "Zoom To", "help": "Zoom to the chosen layer.", "icon": "zoom_full" },
     { "id": "toggle-visibility", "label": "Show/Hide", "help": "Show or hide the chosen layer.", "icon": "eye" }
   ],
   "panel": {
     "title": "My Plugin",
-    "icon": "layers",
+    "icon": "contents",
     "help": "Step through the map's layers.",
     "state": "panel-state",
     "items": [
