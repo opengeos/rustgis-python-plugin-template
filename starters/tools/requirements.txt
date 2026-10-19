@@ -1,0 +1,3 @@
+# Packages the plugin needs, one per line (pip requirements). RustGIS installs them
+# into the plugin's own Python environment with uv when the plugin is installed.
+shapely>=2.0

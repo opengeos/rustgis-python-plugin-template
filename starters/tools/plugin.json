@@ -1,0 +1,68 @@
+{
+  "id": "my-plugin",
+  "name": "My Plugin",
+  "version": "0.1.0",
+  "description": "Geoprocessing tools built on Shapely: convex hulls, true centroids, and a selection of the features whose value compares with a threshold.",
+  "author": "Your Name",
+  "homepage": "https://github.com/you/my-plugin",
+  "license": "MIT",
+  "runtime": "process",
+  "python": { "version": "3.12", "requirements": "requirements.txt" },
+  "run": ["python", "main.py"],
+  "minRustgisVersion": "0.3.0",
+  "permissions": [],
+  "tools": [
+    {
+      "id": "convex-hulls",
+      "name": "Convex Hulls",
+      "summary": "Draws the convex hull of each feature, or of the whole layer.",
+      "toolbox": "My Plugin",
+      "params": [
+        { "name": "input", "label": "Input features", "kind": "vectorLayer", "required": true },
+        { "name": "whole", "label": "One hull for the whole layer", "kind": "bool", "default": false }
+      ]
+    },
+    {
+      "id": "centroids",
+      "name": "Centroids",
+      "summary": "Adds a point at the centroid of each feature, keeping its attributes.",
+      "toolbox": "My Plugin",
+      "params": [
+        { "name": "input", "label": "Input features", "kind": "vectorLayer", "required": true },
+        { "name": "inside", "label": "Keep the point inside the feature", "kind": "bool", "default": false }
+      ]
+    },
+    {
+      "id": "select-by-value",
+      "name": "Select By Value",
+      "summary": "Selects the features whose numeric field compares with a value.",
+      "toolbox": "My Plugin",
+      "params": [
+        { "name": "input", "label": "Input features", "kind": "vectorLayer", "required": true },
+        { "name": "field", "label": "Field", "kind": "numericField", "required": true },
+        { "name": "op", "label": "Comparison", "kind": "choice", "choices": ["greater than", "less than", "equal to"], "default": "greater than" },
+        { "name": "value", "label": "Value", "kind": "number", "default": 0 }
+      ]
+    }
+  ],
+  "i18n": {
+    "de": {
+      "My Plugin": "Mein Plugin",
+      "Convex Hulls": "Konvexe Hüllen",
+      "Centroids": "Schwerpunkte",
+      "Select By Value": "Nach Wert auswählen",
+      "Input features": "Eingabe-Features",
+      "One hull for the whole layer": "Eine Hülle für die ganze Ebene",
+      "Keep the point inside the feature": "Punkt innerhalb des Features halten",
+      "Field": "Feld",
+      "Comparison": "Vergleich",
+      "greater than": "größer als",
+      "less than": "kleiner als",
+      "equal to": "gleich",
+      "Value": "Wert",
+      "{n} hulls": "{n} Hüllen",
+      "{n} centroids": "{n} Schwerpunkte",
+      "{n} of {total} features selected": "{n} von {total} Features ausgewählt"
+    }
+  }
+}
