@@ -27,14 +27,16 @@ appears in RustGIS:
 |---|---|---|
 | [`commands`](starters/commands) (the default) | buttons in a group named after the plugin on the **Plugins** tab | reading the map, running RustGIS commands, adding a layer, translated messages |
 | [`tab`](starters/tab) | a ribbon tab of its own, with groups, a dropdown menu and a tool button | `tab` in `plugin.json`, moving the map, a tool opened from the ribbon |
-| [`panel`](starters/panel) | a pane beside the map, opened from the **Plugins** tab | `panel` in `plugin.json`: a slider, a checkbox, texts and buttons bound to commands, and the state the plugin answers |
+| [`panel`](starters/panel) | a pane beside the map, opened from the **Plugins** tab | `panel` in `plugin.json`: a slider, a checkbox, texts and buttons bound to commands, and the state the plugin answers (a `tree` of nodes it gives too) |
 | [`tools`](starters/tools) | geoprocessing tools in the **Tools** pane, under **Plugins ›** | tool parameters (layer, field, choice, number, bool), new layers and a selection, made with Shapely from `requirements.txt` |
 
 The sections are independent: one plugin can have commands, tools, a tab and a panel. Start
 from one starter and copy what you need from the others.
 
 Panels need a RustGIS newer than 0.3.0. Older versions ignore `panel`, and the panel starter's
-commands still appear on the Plugins tab.
+commands still appear on the Plugins tab. A panel `tree` (nodes the plugin gives with
+`Panel().nodes(...)` and `Node`, the chosen one's id in `req.panel`) needs a RustGIS newer than
+0.4.0, which refuses a manifest with one.
 
 ## Quick start
 
@@ -51,7 +53,7 @@ Everything RustGIS runs is in [`plugin/`](plugin):
 |---|---|
 | `plugin.json` | the manifest: id, version, permissions, commands, tools, tab, panel, translations, and `runtime`, `python` and `run` |
 | `main.py` | the plugin |
-| `rustgis_plugin.py` | the SDK: the protocol, `host` requests, `Request`, `ToolOutput`, `Panel` (standard library only) |
+| `rustgis_plugin.py` | the SDK: the protocol, `host` requests, `Request`, `ToolOutput`, `Panel`, `Node` (standard library only) |
 | `requirements.txt` | the packages the plugin needs |
 
 Put any other modules or data files the plugin needs in `plugin/` as well; the package holds

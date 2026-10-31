@@ -104,6 +104,34 @@ def test_tool_output_and_panel_state():
     }
 
 
+def test_panel_trees_take_nodes_and_give_the_chosen_one():
+    req = rp.Request({"panel": {"values": {"catalogue": "parks", "empty": None}, "changed": ["catalogue"]}})
+    assert (req.panel.get("catalogue"), req.panel.get("empty"), req.panel.get("gone")) == ("parks", None, None)
+
+    env = rp.Node("env", "Environment", count=2, children=[rp.Node("parks", "Parks"), rp.Node("rivers", "Rivers", count=0)])
+    p = rp.Panel().nodes("catalogue", [env, rp.Node("roads", "Roads")]).value("catalogue", "parks")
+    assert p.to_dict() == {
+        "values": {"catalogue": "parks"},
+        "items": {
+            "catalogue": {
+                "nodes": [
+                    {
+                        "id": "env",
+                        "label": "Environment",
+                        "count": 2,
+                        "children": [{"id": "parks", "label": "Parks"}, {"id": "rivers", "label": "Rivers", "count": 0}],
+                    },
+                    {"id": "roads", "label": "Roads"},
+                ]
+            }
+        },
+    }
+    assert rp.Panel().nodes("catalogue", []).value("catalogue", None).to_dict() == {"values": {"catalogue": None}, "items": {"catalogue": {"nodes": []}}}
+    # Nodes replace the ones the tree had; other fields of the widget stay.
+    p = rp.Panel().label("catalogue", "Data").nodes("catalogue", [env]).nodes("catalogue", iter([rp.Node("roads", "Roads")]))
+    assert p.items == {"catalogue": {"label": "Data", "nodes": [{"id": "roads", "label": "Roads"}]}}
+
+
 def test_geojson_helpers():
     assert rp.geojson.polygon([[0, 0], [1, 0], [1, 1]])["coordinates"][0][-1] == [0, 0]
     multi = {"type": "MultiPolygon", "coordinates": [[[[0, 0], [1, 0], [0, 1], [0, 0]]]]}
