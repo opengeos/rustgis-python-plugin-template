@@ -26,11 +26,12 @@ from __future__ import annotations
 import base64
 import json
 import sys
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-__all__ = ["ABI", "Panel", "PluginError", "Request", "ToolOutput", "geojson", "host", "serve"]
+__all__ = ["ABI", "Node", "Panel", "PluginError", "Request", "ToolOutput", "geojson", "host", "serve"]
 
 #: The plugin ABI this SDK speaks. plugin.json's `abi`, when given, must match it.
 ABI = 1
@@ -381,6 +382,39 @@ class ToolOutput:
         return out
 
 
+@dataclass
+class Node:
+    """A node of a panel tree: a theme, a dataset...
+
+    Its id is the tree's value when it is chosen:
+
+        env = Node("env", "Environment", count=2, children=[Node("parks", "Parks"), Node("rivers", "Rivers")])
+        return Panel().nodes("catalogue", [env, Node("roads", "Roads")]).answer()
+    """
+
+    #: What `req.panel.get(tree)` gives when this node is chosen.
+    id: str
+    #: The text the tree shows.
+    label: str
+    #: A number shown beside the label (the datasets in a theme, say); None shows none.
+    count: int | None = None
+    #: The nodes under this one.
+    children: list[Node] = field(default_factory=list)
+
+    def to_dict(self) -> dict:
+        """The node, as RustGIS reads it: `count` and `children` only when it has them.
+
+        Returns:
+            `{"id", "label", "count"?, "children"?}`.
+        """
+        out: dict[str, Any] = {"id": self.id, "label": self.label}
+        if self.count is not None:
+            out["count"] = self.count
+        if self.children:
+            out["children"] = [c.to_dict() for c in self.children]
+        return out
+
+
 class Panel:
     """A panel's new state, which any command of a plugin with a panel can answer.
 
@@ -393,8 +427,9 @@ class Panel:
         self.values: dict[str, Any] = {}
         self.items: dict[str, dict] = {}
 
-    def value(self, widget: str, value: bool | int) -> Panel:
-        """Sets a checkbox (`True`/`False`) or a slider (a whole number).
+    def value(self, widget: str, value: bool | int | str | None) -> Panel:
+        """Sets a checkbox (`True`/`False`), a slider (a whole number) or a tree (a node's id, or
+        `None` for no node chosen).
 
         Args:
             widget: The widget's id.
@@ -470,6 +505,20 @@ class Panel:
         if labels:
             fields["labels"] = labels
         return self._item(widget, **fields)
+
+    def nodes(self, widget: str, nodes: Iterable[Node]) -> Panel:
+        """Gives a tree its nodes, replacing the ones it had. RustGIS keeps at most 5,000 nodes, 8
+        levels deep, and leaves out a node without an id, or whose id is taken already (with its
+        children).
+
+        Args:
+            widget: The tree's id.
+            nodes: Its top nodes, with their children.
+
+        Returns:
+            This state.
+        """
+        return self._item(widget, nodes=[n.to_dict() for n in nodes])
 
     def _item(self, widget: str, **fields: Any) -> Panel:
         self.items.setdefault(widget, {}).update(fields)
